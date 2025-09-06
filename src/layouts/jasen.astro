@@ -5,7 +5,7 @@ let supporterData = await fetchMemberships()
 
 
 ---
-<div class="flex flex-wrap justify-center gap-6">
+<div class="flex flex-col items-center gap-6">
   {supporterData.length > 0 ? (
     supporterData.map((supporter) => (
       <a 
@@ -13,8 +13,9 @@ let supporterData = await fetchMemberships()
         target="_blank" 
         rel="noopener noreferrer"
         title={supporter.title} 
-        class="flex items-center justify-center p-4 bg-white rounded-md shadow-md hover:scale-105 transition-transform w-40 h-20" >
-        {supporter  && (
+        class="flex items-center justify-center p-4 bg-white rounded-md shadow-md hover:scale-105 transition-transform w-40 h-20"
+      >
+        {supporter && (
           <img
             src={supporter.imgUrl} 
             alt={supporter.title}
@@ -24,6 +25,6 @@ let supporterData = await fetchMemberships()
       </a>
     ))
   ) : (
-    <p></p>
+    <p>No supporters available</p> // Show a message if no data is found
   )}
 </div>

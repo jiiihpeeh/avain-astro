@@ -2,15 +2,15 @@
 
 import  returnGallery  from '@/utils/gallerydl'
 import HtmlBody from '@/layouts/htmlbody.astro';
+import Gallery, { type ImageData } from '@/components/ImageGallery';
 import type { Galleries, BaseGallery } from '@/utils/gallerydl';
 import '../styles/global.css';
-import LightGallery from '@/components/LightGallery.astro';
 
 let galleryData : Galleries  = await returnGallery();
 
+
 ---
-<HtmlBody sitestyle="gallery" client:load>
-<script src="/scripts/lightgallery-init.bundle.js" defer is:inline></script>
+<HtmlBody>
   {galleryData.map((gallery: BaseGallery) => (
     <>
       <h3 class="pt-8 text-4xl font-semibold text-green-800 mb-6 sm:text-5xl">
@@ -18,7 +18,7 @@ let galleryData : Galleries  = await returnGallery();
       </h3>
 
       <div class="px-4 sm:px-6 md:px-12">
-        <LightGallery  data={gallery.images} />
+        <Gallery client:load data={gallery.images} />
       </div>
     </>
   ))}

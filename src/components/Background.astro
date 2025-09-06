@@ -1,22 +1,16 @@
 ---
+// background-graphics.astro
 import { cms, site } from "@/utils/constants";
-import fetchBackgroundGraphics from "@/utils/backgroundfetch"
+import fetchBackgroundGraphics from "@/utils/backgroundfetch";
 
-interface ImageData {
-  url: string;
-  alt: string
-}
-
-let backgroundGraphics = await fetchBackgroundGraphics()
-
-
+const backgroundGraphics = await fetchBackgroundGraphics();
 ---
 
 <div class="absolute inset-0 -z-10 overflow-hidden">
-  <!-- gradient background -->
+  <!-- Gradient background -->
   <div class="absolute inset-0 bg-gradient-to-br from-green-100 via-amber-50 to-white"></div>
 
-  <!-- organic blobs -->
+  <!-- Organic blobs -->
   <svg class="absolute -top-40 -left-40 w-[600px] h-[600px] opacity-30 blur-3xl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <path fill="#86efac" d="M40.5,-70.2C52.8,-63.9,63.6,-52.8,71.4,-39.4C79.1,-26,83.8,-10.3,81.7,4.3C79.5,18.8,70.5,31.9,59.4,42.6C48.4,53.3,35.3,61.7,20.5,67.3C5.8,72.9,-10.5,75.6,-25.1,71.1C-39.7,66.7,-52.7,55.2,-62.3,41.3C-71.9,27.3,-78,11,-75.2,-4.9C-72.3,-20.8,-60.4,-36.3,-46.5,-44.9C-32.7,-53.6,-16.3,-55.4,-0.6,-54.6C15.1,-53.8,30.2,-50.4,40.5,-70.2Z" transform="translate(100 100)" />
   </svg>
@@ -25,27 +19,115 @@ let backgroundGraphics = await fetchBackgroundGraphics()
     <path fill="#fde68a" d="M42.7,-73.7C54.6,-66.2,62.9,-54.3,69.2,-41.7C75.5,-29.1,79.8,-15.9,77.4,-3.4C75,-9.2,65.7,7.7,59.8,21.7C54,35.7,51.5,47,43.1,56.7C34.7,66.5,20.4,74.6,5.8,70.7C-8.9,66.8,-17.8,50.8,-29,39.3C-40.2,27.7,-53.7,20.7,-60.7,8.8C-67.7,-3.1,-68.2,-20,-62.4,-35.7C-56.5,-51.4,-44.4,-66,-30.3,-72.1C-16.1,-78.2,-0.8,-75.8,13.9,-72.7C28.7,-69.7,42.7,-66.2,42.7,-73.7Z" transform="translate(100 100)" />
   </svg>
 </div>
-{backgroundGraphics.length > 0 && (
-<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10 flex flex-col justify-between">
-{backgroundGraphics.map((graphic, index) => {
-  const isLeft = index % 2 === 0;
-  const verticalPosition = (index / backgroundGraphics.length) * 90 + 5; // Spread along the vertical axis with some margin
 
-  return (
-    <img 
-      src={graphic.url} 
-      alt={graphic.alt} 
-      class="absolute hidden md:block opacity-50 mix-blend-screen drop-shadow-lg saturate-150 contrast-125"
-      style={{
-        top: `${verticalPosition}%`,
-        left: isLeft ? "5%" : "calc(95% - 200px)",
-        transform: isLeft ? "translateX(-25%)" : "translateX(25%)",
-        width: "200px", // more pronounced
-        height: "auto",
-        objectFit: "contain",
-      }}
-    />
-);
-})}
-</div>
+{backgroundGraphics.length > 0 && (
+  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10 flex flex-col justify-between" id="background-container">
+    {backgroundGraphics.map((graphic, index) => {
+      const isLeft = index % 2 === 0;
+      const imageId = "background-" + index; // Use index to create unique id for each image
+      const imageSize = 220;  // The new image size: 250x250 pixels
+      const margin = 20;      // Spacing between images
+
+      // Calculate dynamic vertical position based on image size
+      const verticalPosition = (index * (imageSize + margin)); 
+
+      return (
+        <img
+          src={graphic.url}
+          id={imageId}
+          class="absolute hidden md:block opacity-50 mix-blend-screen drop-shadow-lg saturate-150 contrast-125"
+          style={{
+            top: `${verticalPosition}px`,   // Use pixel-based vertical positioning
+            left: isLeft ? "5%" : "calc(95% - 250px)",  // Left or right positioning
+            transform: isLeft ? "translateX(-25%)" : "translateX(25%)",  // Adjust based on position
+            width: `${imageSize}px`,        // Set the width to 250px
+            height: `${imageSize}px`,       // Set the height to 250px
+            objectFit: "contain",
+          }}
+        />
+      );
+    })}
+  </div>
 )}
+
+<script type="module">
+  async function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  // Shuffle function (Fisher-Yates)
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+  };
+
+  // Track the previous order of indexes
+  let previousOrder = [];
+
+  // Function to shuffle and ensure a different order from the previous one
+  const getShuffledOrder = (array) => {
+    let newOrder;
+    do {
+      // Create an array of indexes and shuffle
+      newOrder = [...array];
+      shuffleArray(newOrder);
+    } while (arraysAreEqual(newOrder, previousOrder));  // Keep shuffling if the order is the same as the last one
+    previousOrder = newOrder;  // Update the previous order
+    return newOrder;
+  };
+
+  // Function to compare two arrays
+  const arraysAreEqual = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+  };
+
+  // Function to update the images every 10 seconds with transformation effects
+  async function updateImages(){
+    await sleep(1000)
+    const container = document.getElementById('background-container');
+    const images = Array.from(container.querySelectorAll('img'));
+
+    // Create an array of indexes
+    const indexes = images.map((_, index) => index);
+
+    // Get the new shuffled order of indexes (ensuring it's not the same as the previous order)
+    const shuffledIndexes = getShuffledOrder(indexes);
+
+    // Add a transformation effect before re-positioning
+    shuffledIndexes.forEach((index, newIndex) => {
+      const img = images[index];
+      const imageSize = 200;
+      const margin = 20;
+      const verticalPosition = (newIndex * (imageSize + margin));
+
+      // Start transition effect by adding transform
+      img.style.transition = "transform 1s ease-in-out, opacity 1s ease-in-out";
+      img.style.opacity = "0";  // Start by fading out
+
+      // Wait for the opacity to fade before moving to the next position
+      setTimeout(() => {
+        // Re-calculate the position for shuffling
+        img.style.top = `${verticalPosition + 48}px`;
+        img.style.left = newIndex % 2 === 0 ? "5%" : "calc(95% - 250px)";
+        img.style.transform = `translateX(${(newIndex % 2 === 0 ? -1 : 1) * 25}%) rotate(${Math.random() * 20 - 10}deg) scale(${Math.random() * 0.35 + 0.75})`;  // Add rotation and scaling
+        img.style.opacity = "1";  // Fade back in
+      }, 500);  // Give time for opacity to transition
+
+      // Ensure all images have a smooth transition effect
+      img.style.transition = "transform 1s ease-in-out, opacity 1s ease-in-out";
+    });
+
+    console.log("Images shuffled with effects!");
+  };
+
+  // Initial shuffle on page load
+  updateImages();
+
+  // Set interval to shuffle images every 10 seconds
+  setInterval(updateImages, 10000);
+</script>

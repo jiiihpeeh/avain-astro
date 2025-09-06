@@ -68,7 +68,7 @@ export default async function fetchSupporters(): Promise<SupporterData[]> {
   if (mode === 'production' || mode === 'preview') {
     if (await fs.pathExists(cachePath)) {
       const meta = await fs.readJSON(cachePath);
-      console.log("read from disk")
+      //console.log("read from disk")
       return meta.supporters;
     } else {
       console.warn('⚠️ supporters-meta.json missing in production/preview');

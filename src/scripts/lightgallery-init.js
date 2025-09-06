@@ -28,13 +28,19 @@ export async function initLightGallery() {
 
   document.querySelectorAll('a[data-base]').forEach((link) => {
     const base = link.dataset.base;
+    const thumbnailElement = link.querySelector('img');
+    if (!thumbnailElement) return;
+    const thumbnailBase = thumbnailElement.src.split('.').slice(0, -1).join('.')
     if (!base) return;
     if (avifSupported) {
       link.href = `${base}.avif`;
+      thumbnailElement.src = `${thumbnailBase}.avif`
     } else if (webpSupported) {
       link.href = `${base}.webp`;
+      thumbnailElement.src = `${thumbnailBase}.webp`
     } else {
       link.href = `${base}.jpg`;
+      thumbnailElement.src = `${thumbnailBase}.jpg`
     }
   });
 
