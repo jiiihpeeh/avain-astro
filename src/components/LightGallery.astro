@@ -37,7 +37,7 @@ const galleryId = `lightgallery_${randomUUID()}`;
           src={`${item.thumbnail}.jpg`}
           alt={item.description}
           loading="lazy"
-          class="w-full h-[180px] object-contain rounded-lg shadow-sm bg-white"
+          class="w-full h-[180px] object-contain rounded-lg shadow-sm bg-white transform transition-transform duration-200 hover:scale-105 hover:translate-y-2 hover:shadow-lg"
         />
       </picture>
     </a>
