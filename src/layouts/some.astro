@@ -1,0 +1,24 @@
+---
+import fetchSocialMedia from "@/utils/fetchSome"
+let some = await fetchSocialMedia()
+---
+
+<div class="flex justify-center space-x-6">
+  {some ? (
+    some.map((item) => (
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-block p-2 rounded-full bg-white hover:bg-gray-200 transition-colors"      >
+        <img
+          src={item.iconUrl}
+          alt={item.iconUrl || 'Social Media Icon'}
+          class="w-8 h-8"
+        />
+      </a>
+    ))
+  ) : (
+    <p>Loading...</p> // Show loading message if data is not available
+  )}
+</div>

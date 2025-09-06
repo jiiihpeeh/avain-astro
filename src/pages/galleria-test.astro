@@ -1,0 +1,25 @@
+---
+
+import  returnGallery  from '@/utils/gallerydl'
+import HtmlBody from '@/layouts/htmlbody.astro';
+import type { Galleries, BaseGallery } from '@/utils/gallerydl';
+import '../styles/global.css';
+import LightGallery from '@/components/LightGallery.astro';
+
+let galleryData : Galleries  = await returnGallery();
+
+---
+<HtmlBody sitestyle="gallery" client:load>
+<script src="/scripts/lightgallery-init.bundle.js" defer is:inline></script>
+  {galleryData.map((gallery: BaseGallery) => (
+    <>
+      <h3 class="pt-8 text-4xl font-semibold text-green-800 mb-6 sm:text-5xl">
+        {gallery.description}
+      </h3>
+
+      <div class="px-4 sm:px-6 md:px-12">
+        <LightGallery  data={gallery.images} />
+      </div>
+    </>
+  ))}
+</HtmlBody>

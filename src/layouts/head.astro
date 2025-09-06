@@ -1,0 +1,28 @@
+---
+import favIconFetch from '@/utils/getheader';
+
+/* import "/css/lightgallery.css"
+import "/css/lg-zoom.css"
+import "/css/lg-thumbnail.css"
+
+ */
+const { otsikko, sitestyle } = Astro.props;
+const favurl = await favIconFetch()
+
+
+---
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{otsikko}</title> <!-- Dynamically set the page title -->
+    <link rel="icon" type="image/svg+xml" href={favurl}>
+    <meta name="google-site-verification" content="rT03zAf9M1q4u4iMxKeI2L1bqD_1QeJk8O2ot4cNaiA" />
+    {sitestyle === 'gallery' && (
+        <>
+        <link rel="stylesheet" href="/css/lightgallery.css" />
+        <link rel="stylesheet" href="/css/lg-zoom.css" />
+        <link rel="stylesheet" href="/css/lg-thumbnail.css" />
+        </>
+    )}
+</head>

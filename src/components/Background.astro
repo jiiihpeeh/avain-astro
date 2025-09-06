@@ -1,0 +1,51 @@
+---
+import { cms, site } from "@/utils/constants";
+import fetchBackgroundGraphics from "@/utils/backgroundfetch"
+
+interface ImageData {
+  url: string;
+  alt: string
+}
+
+let backgroundGraphics = await fetchBackgroundGraphics()
+
+
+---
+
+<div class="absolute inset-0 -z-10 overflow-hidden">
+  <!-- gradient background -->
+  <div class="absolute inset-0 bg-gradient-to-br from-green-100 via-amber-50 to-white"></div>
+
+  <!-- organic blobs -->
+  <svg class="absolute -top-40 -left-40 w-[600px] h-[600px] opacity-30 blur-3xl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#86efac" d="M40.5,-70.2C52.8,-63.9,63.6,-52.8,71.4,-39.4C79.1,-26,83.8,-10.3,81.7,4.3C79.5,18.8,70.5,31.9,59.4,42.6C48.4,53.3,35.3,61.7,20.5,67.3C5.8,72.9,-10.5,75.6,-25.1,71.1C-39.7,66.7,-52.7,55.2,-62.3,41.3C-71.9,27.3,-78,11,-75.2,-4.9C-72.3,-20.8,-60.4,-36.3,-46.5,-44.9C-32.7,-53.6,-16.3,-55.4,-0.6,-54.6C15.1,-53.8,30.2,-50.4,40.5,-70.2Z" transform="translate(100 100)" />
+  </svg>
+
+  <svg class="absolute bottom-0 right-0 w-[400px] h-[400px] opacity-20 blur-2xl" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <path fill="#fde68a" d="M42.7,-73.7C54.6,-66.2,62.9,-54.3,69.2,-41.7C75.5,-29.1,79.8,-15.9,77.4,-3.4C75,-9.2,65.7,7.7,59.8,21.7C54,35.7,51.5,47,43.1,56.7C34.7,66.5,20.4,74.6,5.8,70.7C-8.9,66.8,-17.8,50.8,-29,39.3C-40.2,27.7,-53.7,20.7,-60.7,8.8C-67.7,-3.1,-68.2,-20,-62.4,-35.7C-56.5,-51.4,-44.4,-66,-30.3,-72.1C-16.1,-78.2,-0.8,-75.8,13.9,-72.7C28.7,-69.7,42.7,-66.2,42.7,-73.7Z" transform="translate(100 100)" />
+  </svg>
+</div>
+{backgroundGraphics.length > 0 && (
+<div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10 flex flex-col justify-between">
+{backgroundGraphics.map((graphic, index) => {
+  const isLeft = index % 2 === 0;
+  const verticalPosition = (index / backgroundGraphics.length) * 90 + 5; // Spread along the vertical axis with some margin
+
+  return (
+    <img 
+      src={graphic.url} 
+      alt={graphic.alt} 
+      class="absolute hidden md:block opacity-50 mix-blend-screen drop-shadow-lg saturate-150 contrast-125"
+      style={{
+        top: `${verticalPosition}%`,
+        left: isLeft ? "5%" : "calc(95% - 200px)",
+        transform: isLeft ? "translateX(-25%)" : "translateX(25%)",
+        width: "200px", // more pronounced
+        height: "auto",
+        objectFit: "contain",
+      }}
+    />
+);
+})}
+</div>
+)}

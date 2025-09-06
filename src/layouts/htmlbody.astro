@@ -1,0 +1,14 @@
+---
+import Body from "./body.astro";
+import Head from "./head.astro";
+
+const { otsikko = "Avainasema", sitestyle = "default" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="fi">
+  <Head otsikko={otsikko} sitestyle={sitestyle} />
+  <Body>
+    <slot/>
+  </Body>
+</html>

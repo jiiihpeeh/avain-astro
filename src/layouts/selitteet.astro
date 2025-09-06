@@ -1,0 +1,82 @@
+---
+import Popup from "@/components/Popup";
+import PopupAstro from "@/components/PopupAstro.astro";
+import type { Info } from "@/utils/fetchindex";
+//import type { Info } from "@/pages/index.astro";
+let selitteet: Array<Info> = Astro.props.selitteet
+---
+<script type="module"  is:inline>
+"use strict";
+function positionPopup(button, box) {
+    const rect = button.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    if (spaceBelow < 230) {
+        box.classList.add("bottom-full", "mb-3");
+        box.classList.remove("top-full", "mt-3");
+    }
+    else {
+        box.classList.add("top-full", "mt-3");
+        box.classList.remove("bottom-full", "mb-3");
+    }
+}
+// Utility: get the base id (popup-UUID) from an element id like popup-UUID-button
+function getBaseIdFromId(id) {
+    const match = id.match(/^(popup-[a-f0-9-]+)-button$/);
+    return match ? match[1] : null;
+}
+document.addEventListener("mouseenter", (event) => {
+    const target = event.target;
+    if (!target.id)
+        return;
+    const baseId = getBaseIdFromId(target.id);
+    if (!baseId)
+        return;
+    const button = document.getElementById(`${baseId}-button`);
+    const box = document.getElementById(`${baseId}-box`);
+    if (!button || !box)
+        return;
+    positionPopup(button, box);
+    box.classList.add("opacity-100", "pointer-events-auto");
+    box.classList.remove("opacity-0", "pointer-events-none");
+}, true); // useCapture true to catch events earlier
+document.addEventListener("mouseleave", (event) => {
+    const target = event.target;
+    if (!target.id)
+        return;
+    const baseId = getBaseIdFromId(target.id);
+    if (!baseId)
+        return;
+    const box = document.getElementById(`${baseId}-box`);
+    if (!box)
+        return;
+    box.classList.add("opacity-0", "pointer-events-none");
+    box.classList.remove("opacity-100", "pointer-events-auto");
+}, true);
+window.addEventListener("resize", () => {
+    document.querySelectorAll("[id$='-box'].opacity-100").forEach((box) => {
+        const boxId = box.id;
+        const baseId = boxId.replace(/-box$/, "");
+        const button = document.getElementById(`${baseId}-button`);
+        if (!button)
+            return;
+        positionPopup(button, box);
+    });
+});
+</script>
+
+
+<div class="flex flex-col sm:flex-row sm:space-x-8 space-y-4 sm:space-y-0 items-center sm:items-start">
+  {selitteet.map((info, index) => (
+    <div class="flex-shrink-0 max-w-xs relative">
+{/*       <Popup 
+        title={info.title} 
+        description={info.description} 
+        client:load
+      /> */}
+      <PopupAstro 
+        title={info.title} 
+        description={info.description} 
+      />
+    </div>
+  ))}
+</div>

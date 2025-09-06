@@ -1,0 +1,31 @@
+/* Thumbnails */
+.image-gallery-thumbnail img {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Main images */
+.image-gallery-slide img {
+  width: auto;
+  height: 640px;
+  max-height: 80vh;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Fullscreen override */
+.image-gallery-fullscreen .image-gallery-slide {
+  height: 100vh; /* Ensure the slide container takes full viewport height */
+  display: flex; /* Optional: helps with centering */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+}
+
+.image-gallery-fullscreen .image-gallery-slide img {
+  height: auto !important; /* Override any fixed height */
+  max-height: 100vh; /* Max to viewport height */
+  width: auto !important; /* Ensure width scales naturally */
+  max-width: 100vw; /* Prevent width from exceeding viewport */
+  object-fit: contain; /* Show entire image */
+}

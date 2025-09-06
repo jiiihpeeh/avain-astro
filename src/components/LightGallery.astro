@@ -1,0 +1,33 @@
+---
+import { randomUUID } from 'crypto';
+
+export interface ImageData {
+  original: string;  // with extension, e.g. /images/photo1.jpg
+  thumbnail: string; // base path without extension, e.g. /images/thumbs/photo1
+  description: string;
+  type?: 'image' | 'video';
+}
+
+const data = (Astro.props.data ?? []) as ImageData[];
+
+const stripExtension = (path: string) => path.replace(/\.[^/.]+$/, "");
+
+const dataWithBase = data.map(item => ({
+  ...item,
+  base: stripExtension(item.original),
+}));
+
+const galleryId = `lightgallery_${randomUUID()}`;
+---
+
+<div id={galleryId}>
+  {dataWithBase.map((item) => (
+    <a data-base={item.base} href={`${item.base}.jpg`} aria-label={item.description}>
+      <picture>
+        <source srcset={`${item.thumbnail}.avif`} type="image/avif" />
+        <source srcset={`${item.thumbnail}.webp`} type="image/webp" />
+        <img src={`${item.thumbnail}.jpg`} alt={item.description} loading="lazy" />
+      </picture>
+    </a>
+  ))}
+</div>

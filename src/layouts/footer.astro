@@ -1,0 +1,36 @@
+---
+import Jasen from "./jasen.astro";
+import Some from "./some.astro";
+import Tukija from "./tukija.astro";
+
+
+
+---
+
+<footer class="bg-green-800 text-white py-10 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Partners -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Tukijat</h3>
+          <Tukija/>
+        </div>
+  
+      
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Jäsenyys</h3>
+          <Jasen/>
+        </div>
+  
+        <!-- Social Media -->
+        <div>
+          <h3 class="text-lg font-semibold mb-4">Seuraa meitä</h3>
+          <Some/>
+        </div>
+      </div>
+  
+      <div class="mt-10 text-center text-sm text-gray-300">
+        © {new Date().getFullYear()} Avainasema. 
+      </div>
+    </div>
+  </footer>

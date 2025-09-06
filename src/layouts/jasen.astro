@@ -1,0 +1,29 @@
+---
+import fetchMemberships from "@/utils/fetchMemberships"
+
+let supporterData = await fetchMemberships()
+
+
+---
+<div class="flex flex-wrap justify-center gap-6">
+  {supporterData.length > 0 ? (
+    supporterData.map((supporter) => (
+      <a 
+        href={supporter.link} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        title={supporter.title} 
+        class="flex items-center justify-center p-4 bg-white rounded-md shadow-md hover:scale-105 transition-transform w-40 h-20" >
+        {supporter  && (
+          <img
+            src={supporter.imgUrl} 
+            alt={supporter.title}
+            class="w-40 h-20 object-contain"
+          />
+        )}
+      </a>
+    ))
+  ) : (
+    <p></p>
+  )}
+</div>

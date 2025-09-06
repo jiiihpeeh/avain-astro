@@ -1,0 +1,16 @@
+[Unit]
+Description=Astro
+After=network.target
+
+[Service]
+Type=simple
+User=strapi
+Group=strapi
+WorkingDirectory=/home/strapi/avain-astro/
+ExecStart=/home/strapi/avain-astro/start.sh
+Restart=always
+Environment=NODE_ENV=production
+Environment=PORT=4321
+
+[Install]
+WantedBy=multi-user.target

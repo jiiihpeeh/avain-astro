@@ -1,0 +1,81 @@
+---
+
+
+import fetchNavbarData from "@/utils/navfetch"
+
+let { sivut, logoUrl} = await fetchNavbarData()
+
+---
+
+
+<nav class="bg-[#cff8c2]  fixed w-full top-0 left-0 z-50 transition-all" id="navbar">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <img src={logoUrl} alt="Logo" class="h-8 w-auto" loading="eager"/>
+        </div>
+        <!-- Desktop Menu -->
+        <div class="hidden md:block">
+          <div class="ml-10 flex items-baseline space-x-4">
+            {sivut.map((item) => (
+              <a href={item.sivu} class="text-black hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                {item.nimi}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Hamburger for Mobile -->
+      <div class="md:hidden">
+        <button id="hamburger" class="text-gray focus:outline-none">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="md:hidden hidden bg-[#cff8c2]">
+    <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+      {sivut.map((item) => (
+        <a href={item.sivu} class="text-gray-600 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+          {item.nimi}
+        </a>
+      ))}
+    </div>
+  </div>
+</nav>
+
+<script>
+   document.addEventListener("DOMContentLoaded", () => {  
+    // Hamburger menu toggle
+    const hamburgerButton = document.getElementById('hamburger');
+    const mobileMenu = document.getElementById('mobile-menu');
+      if (!hamburgerButton || !mobileMenu) {
+        return; 
+      }
+    hamburgerButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+
+    // Shrink navbar on scroll
+    const navbar = document.getElementById('navbar');
+      if (navbar === null) {
+        return
+      }
+    // window.onscroll = () => {
+    //     if (window.scrollY > 50) {
+    //     navbar.classList.add('bg-[#cff8c2]', 'shadow-lg');
+    //     navbar.classList.remove('bg-[#cff8c2]');
+    //     } else {
+    //     navbar.classList.remove('bg-[#cff8c2]', 'shadow-lg');
+    //     navbar.classList.add('bg-[#cff8c2]');
+    //     }
+    // };
+  })
+</script>

@@ -1,0 +1,351 @@
+---
+import Body from '@/layouts/body.astro';
+import Head from '@/layouts/head.astro';
+import HtmlBody from '@/layouts/htmlbody.astro';
+import { cms } from '@/utils/constants';
+import '../styles/global.css';
+import { PhantomForm } from 'astro-phantom-forms';
+
+export interface Welcome {
+    data: Datum[];
+    meta: Meta;
+}
+
+export interface Datum {
+    id:          number;
+    documentId:  string;
+    createdAt:   Date;
+    updatedAt:   Date;
+    publishedAt: Date;
+    seloste:     Seloste;
+}
+
+export interface Seloste {
+    id:                number;
+    documentId:        string;
+    name:              string;
+    alternativeText:   null;
+    caption:           null;
+    width:             null;
+    height:            null;
+    formats:           null;
+    hash:              string;
+    ext:               string;
+    mime:              string;
+    size:              number;
+    url:               string;
+    previewUrl:        null;
+    provider:          string;
+    provider_metadata: null;
+    createdAt:         Date;
+    updatedAt:         Date;
+    publishedAt:       Date;
+}
+
+export interface Meta {
+    pagination: Pagination;
+}
+
+export interface Pagination {
+    page:      number;
+    pageSize:  number;
+    pageCount: number;
+    total:     number;
+}
+
+
+const response = await fetch('https://cms.avainasema.org/api/rekisteriselosteet?populate=*');
+const welcomeData: Welcome = await response.json();
+
+// Get the file URL from the first record (safe check)
+const fileUrl = welcomeData.data[0]?.seloste?.url ?? '';
+// If URL is relative, prepend the base domain:
+const baseDomain = 'https://cms.avainasema.org';
+const fullFileUrl = fileUrl.startsWith('http') ? fileUrl : baseDomain + fileUrl;
+
+---
+<HtmlBody>
+
+   <div class="bg-white mt-16 rounded-lg">
+
+    <PhantomForm mode="load">
+    <form id="applicationForm" class="max-w-4xl mx-auto p-8 space-y-6  shadow-md rounded-lg " action="/api/submit" method="POST">
+        <h2 class="text-2xl font-bold text-gray-900">Hakemus nuorten työpaja Avainasemalle</h2>
+
+          <div class="bg-green-100 p-4 rounded-lg">
+              <p class="text-md text-left">Kun olemme vastaanottaneet hakemuksesi olemme sinuun ja vastuuvirkailijaasi
+                yhteydessä.</p> 
+              <p class="text-md text-left">Selvitetään yhdessä mahdollisuutesi päästä Avainasemalle!</p>
+          </div>
+          <!-- Name Field -->
+          
+          <div class="space-y-2">
+            <label for="nimi" class="block text-gray-700">Nimi</label>
+            <input
+              type="text"
+              id="nimi"
+              name="nimi"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" nimesi "
+            />
+          </div>
+
+          <!-- Delay Check Field -->
+          <input type="hidden" id="formStartTime" name="formStartTime" value="" />
+          
+          <!-- Birthday Field -->
+          <div class="space-y-2">
+            <label for="syntymaaika" class="block text-gray-700">Syntymäaika</label>
+            <input
+              type="date"
+              id="syntymaaika"
+              name="syntymaaika"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" syntymäaikasi "
+            />
+          </div>
+          
+          <!-- Address Field -->
+          <div class="space-y-2">
+            <label for="katuosoite" class="block text-gray-700">Katuosoite</label>
+            <input
+              type="text"
+              id="katuosoite"
+              name="katuosoite"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" katuosoitteesi "
+            />
+          </div>
+          
+          <!-- Postinumero Field -->
+          <div class="space-y-2">
+            <label for="postinumero" class="block text-gray-700">Postinumero</label>
+            <input
+              type="number"
+              id="postinumero"
+              name="postinumero"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" postinumero "
+            />
+          </div>
+          
+          <!-- Postitoimipaikka Field -->
+          <div class="space-y-2">
+            <label for="postitoimipaikka" class="block text-gray-700">Postitoimipaikka</label>
+            <input
+              type="text"
+              id="postitoimipaikka"
+              name="postitoimipaikka"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" postitoimipaikka "
+            />
+          </div>
+          
+          <!-- Puhelin Field -->
+          <div class="space-y-2">
+            <label for="puhelin" class="block text-gray-700">Puhelin</label>
+            <input
+              type="text"
+              id="puhelin"
+              name="puhelin"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" puhelinnumero "
+            />
+          </div>
+          
+          <!-- Email Field -->
+          <div class="space-y-2">
+            <label for="email" class="block text-gray-700">Sähköposti</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" sähköpostisoitteesi "
+            />
+          </div>
+          
+          <!-- Työttömyystieto Field -->
+          <div class="space-y-2">
+            <label for="ilmoittautunut" class="block text-gray-700">Oletko ilmoittautunut työttömäksi työnhakijaksi?</label>
+            <div class="mt-2 space-x-4">
+              <label class="inline-flex items-center">
+                <input type="radio" name="unemployed" value="yes" required class="form-radio text-indigo-600" />
+                <span class="ml-2">Kyllä</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="radio" name="unemployed" value="no" required class="form-radio text-indigo-600" />
+                <span class="ml-2">Ei</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Vastuuvirkailija Field -->
+          <div class="space-y-2">
+            <label for="vastuuvirkailija" class="block text-base font-medium text-gray-700">Tiedätkö kuka on vastuuvirkailijasi?</label>
+            <input
+              type="text"
+              id="vastuuvirkailija"
+              name="vastuuvirkailija"
+              required
+              class="mt-1 block w-full p-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white"
+              placeholder=" vastuuvirkailija"
+            />
+          </div>
+          
+          <!-- Työkokeilu mahdollisuus Field -->
+          <div class="space-y-2">
+            <label class="block text-base font-medium text-gray-700">Onko vastuuvirkailijasi kertonut, että sinulla on mahdollisuus päästä:</label>
+            <div class="mt-2 space-x-4">
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="workTrial" value="yes" class="form-checkbox text-indigo-600" />
+                <span class="ml-2">Työkokeiluun</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="checkbox" name="workTrial" value="unknown" class="form-checkbox text-indigo-600" />
+                <span class="ml-2">En tiedä</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Education Field -->
+          <div class="space-y-2">
+            <label for="education" class="block text-base font-medium text-gray-700">Mikä on pohjakoulutuksesi tai opiskeletko juuri tällä hetkellä?</label>
+            <textarea
+              id="education"
+              name="education"
+              rows="4"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
+              required
+            ></textarea>
+          </div>
+          
+          <!-- Internship Query -->
+          <div class="space-y-2">
+            <label class="block text-base font-medium text-gray-700">Oletko opiskelija ja etsit työssäoppimis- / koulutussopimuspaikkaa?</label>
+            <div class="mt-2 space-x-4">
+              <label class="inline-flex items-center">
+                <input type="radio" name="seekingInternship" value="yes" required class="form-radio text-indigo-600 bg-white" />
+                <span class="ml-2">Kyllä</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="radio" name="seekingInternship" value="no" required class="form-radio text-indigo-600 bg-white" />
+                <span class="ml-2">Ei</span>
+              </label>
+            </div>
+          </div>
+       
+        <div style="display: none;">
+          <label for="syyt">Syyt</label>
+          <input type="text" name="syyt" id="syyt" autocomplete="off" tabindex="-1" />
+        </div>
+          <!-- Work Experience Field -->
+          <div class="space-y-2">
+            <label for="kokemus" class="block text-base font-medium text-gray-700">Kerro vähän mahdollisesta työkokemuksestasi</label>
+            <textarea
+              id="kokemus"
+              name="kokemus"
+              rows="4"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
+              required
+            ></textarea>
+          </div>
+          
+          <!-- About Yourself Field -->
+          <div class="space-y-2">
+            <label for="kerroitsesta" class="block text-base font-medium text-gray-700">Kerro vähän itsestäsi</label>
+            <textarea
+              id="kerroitsesta"
+              name="kerroitsesta"
+              rows="4"
+              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm bg-white"
+              required
+            ></textarea>
+          </div>
+          
+          <!-- Privacy Policy -->
+          <div class="space-y-2">
+            <label class="block text-base font-medium text-gray-700">Asiakasrekisteriseloste</label>
+            <a href={fullFileUrl} target="_blank" class="text-indigo-600">
+              Lue asiakasrekisteriseloste
+            </a>
+          </div>
+          
+          <!-- Agree to Terms -->
+          <div class="space-y-2">
+            <label class="inline-flex items-center">
+              <input type="checkbox" name="hyvehdot" required class="form-checkbox text-indigo-600" />
+              <span class="ml-2">Olen lukenut ja hyväksynyt asiakasrekisteriselosteen</span>
+            </label>
+          </div>
+          
+          <!-- Submit Button -->
+          <div>
+            <button
+              type="submit"
+              class="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition-colors"
+            >
+              Lähetä hakemus
+            </button>
+          </div>
+          
+      </form>
+      </PhantomForm>
+    </div>
+    <div id="successMessage" class="hidden mt-6 p-4 text-green-800 bg-green-100 rounded-lg">
+      ✅ Hakemus on lähetetty onnistuneesti!
+    </div>
+    <script type="module">
+      const form = document.getElementById('applicationForm');
+      const successMessage = document.getElementById('successMessage');
+      const startTimeInput = document.getElementById('formStartTime');
+  
+      // Set form load timestamp
+      startTimeInput.value = Date.now();
+  
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+  
+        // Check delay (minimum 3 seconds)
+        const startTime = parseInt(startTimeInput.value, 10);
+        const now = Date.now();
+        const elapsedSeconds = (now - startTime) / 1000;
+  
+        if (elapsedSeconds < 3) {
+          alert('Lähetys tapahtui liian nopeasti, yritä uudelleen.');
+          return;
+        }
+  
+        const formData = new FormData(form);
+  
+        // Optional: Check honeypot field here if you want (syyt should be empty)
+        if (formData.get('syyt')) {
+          alert('Lähetys epäonnistui.');
+          return;
+        }
+  
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          body: formData,
+        });
+  
+        if (res.ok) {
+          form.reset();
+          // Reset timestamp on success to prevent immediate resubmit issues
+          startTimeInput.value = Date.now();
+  
+          successMessage.classList.remove('hidden');
+          successMessage.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          alert('Lähetys epäonnistui. Yritä uudelleen.');
+        }
+      });
+    </script>
+</HtmlBody>

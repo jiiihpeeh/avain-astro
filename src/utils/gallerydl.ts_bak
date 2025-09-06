@@ -1,0 +1,166 @@
+import fs from 'fs-extra';
+import path from 'path';
+import axios from 'axios';
+import { convertImage } from '@/utils/compressImage';
+import { cms, site } from '@/utils/constants';
+import { getEnvMode } from '@/utils/getEnvMode';
+
+interface ImageData {
+  hash: string;
+  ext: string;
+  url: string;
+}
+
+interface KuvaItem {
+  kuvaus: string | null;
+  kuva: ImageData | null;
+}
+
+interface Osa {
+  Nimi: string;
+  kuva: KuvaItem[];
+}
+
+interface Galleria {
+  osat: Osa[];
+}
+
+interface GalleriaResponse {
+  data: Galleria[];
+}
+
+interface ImgInfo {
+  original: string;
+  thumbnail: string;
+  description: string;
+}
+
+export interface BaseGallery {
+  description: string;
+  images: ImgInfo[];
+}
+
+export type Galleries = BaseGallery[];
+
+export default async function fetchGallery(): Promise<Galleries> {
+  const mode = getEnvMode();
+  const cacheDir = './public/gallery';
+  const cachePath = path.join(cacheDir, 'galleryData.json');
+  const thumbSize = 240;
+  const maxWidth = 1920;
+  const maxHeight = 1440;
+
+  await fs.ensureDir(cacheDir);
+
+  // ✅ Use cache in production/preview
+  if (mode === 'production' || mode === 'preview') {
+    if (await fs.pathExists(cachePath)) {
+      const cached = await fs.readJSON(cachePath);
+      return cached;
+    } else {
+      console.warn('⚠️ galleryData.json missing in production/preview!');
+      return [];
+    }
+  }
+
+  const galleryData: Galleries = [];
+
+  try {
+    const response = await axios.get<GalleriaResponse>(
+      `${cms}/api/galleriat?populate[osat][populate][kuva][populate]=*`
+    );
+
+    for (const galleria of response.data.data) {
+      for (const osa of galleria.osat) {
+        const galleryEntry: BaseGallery = {
+          description: osa.Nimi,
+          images: [],
+        };
+
+        for (const kuvaItem of osa.kuva) {
+          const image = kuvaItem.kuva;
+          if (!image || !image.url) continue;
+
+          const imageUrl = `${cms}${image.url}`;
+          const filename = `${image.hash}${image.ext}`;
+          const baseName = path.join(cacheDir, image.hash);
+          const originalFilePath = path.join(cacheDir, filename);
+
+          if (!fs.existsSync(originalFilePath)) {
+            const imgRes = await axios.get<ArrayBuffer>(imageUrl, {
+              responseType: 'arraybuffer',
+            });
+            await fs.writeFile(originalFilePath, Buffer.from(imgRes.data));
+            console.log(`✅ Downloaded: ${originalFilePath}`);
+          }
+
+          const variants = {
+            webp: {
+              view: `${baseName}_img.webp`,
+              thumb: `${baseName}_thumb.webp`,
+            },
+            avif: {
+              view: `${baseName}_img.avif`,
+              thumb: `${baseName}_thumb.avif`,
+            },
+            jpeg: {
+              view: `${baseName}_img.jpg`,
+              thumb: `${baseName}_thumb.jpg`,
+            },
+          };
+
+          const qualitySettings = {
+            webp: { view: 85, thumb: 70 },
+            jpeg: { view: 90, thumb: 75 },
+            avif: { view: 60, thumb: 40 },
+          };
+
+          for (const [format, paths] of Object.entries(variants)) {
+            const q = qualitySettings[format as keyof typeof qualitySettings];
+
+            if (!fs.existsSync(paths.view)) {
+              await convertImage(originalFilePath, paths.view, {
+                format: format as 'webp' | 'jpeg' | 'avif',
+                quality: q.view,
+                maxWidth,
+                maxHeight,
+              });
+            }
+
+            if (!fs.existsSync(paths.thumb)) {
+              await convertImage(originalFilePath, paths.thumb, {
+                format: format as 'webp' | 'jpeg' | 'avif',
+                quality: q.thumb,
+                maxWidth: thumbSize,
+                maxHeight: thumbSize
+              });
+            }
+          }
+
+          // Only use webp in frontend
+          galleryEntry.images.push({
+            original: publicUrl(variants.webp.view),
+            thumbnail: publicUrl(variants.webp.thumb),
+            description: kuvaItem.kuvaus ?? '',
+          });
+        }
+
+        if (galleryEntry.images.length > 0) {
+          galleryData.push(galleryEntry);
+        }
+      }
+    }
+
+    await fs.writeJson(cachePath, galleryData, { spaces: 2 });
+    console.log('🎉 Gallery data fetched and cached.');
+
+    return galleryData;
+  } catch (err) {
+    console.error('❌ Failed to fetch or process gallery:', err);
+    return [];
+  }
+
+  function publicUrl(filepath: string): string {
+    return `${site}/${filepath.replace(/^public\//, '').replace(/\.[a-z0-9]+$/i, '')}`;
+  }
+}

@@ -1,0 +1,38 @@
+---
+// global layout component (e.g., `layouts/main.astro`)
+import Nav from '@/components/Nav.astro';
+import Footer from '@/layouts/footer.astro';
+import Background from '@/components/Background.astro';
+
+const { title, children } = Astro.props; // Dynamic title and content will be passed in from pages
+---
+
+<!DOCTYPE html>
+<html lang="fi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title> <!-- Dynamically set the page title -->
+  </head>
+
+  <body class="relative flex flex-col min-h-screen overflow-x-hidden">
+    <!-- Background and decorative shapes -->
+    <div class="absolute inset-0 -z-10 bg-gradient-to-br from-green-100 via-amber-50 to-white"></div>
+    <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-green-200 opacity-20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 right-0 w-[400px] h-[400px] bg-amber-200 opacity-20 rounded-full blur-2xl"></div>
+
+    <!-- Navigation bar -->
+    <Nav />
+
+    <!-- Main content area where page-specific content will be rendered -->
+    <div class="relative w-full flex-grow">
+      <main class="flex-grow flex flex-col justify-start items-center px-4 pt-8 pb-12 space-y-8">
+        <Background /> <!-- Always present on all pages -->
+        {children} <!-- Page-specific content goes here -->
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <Footer />
+  </body>
+</html>

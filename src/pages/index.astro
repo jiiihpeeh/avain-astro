@@ -1,0 +1,31 @@
+---
+
+import '../styles/global.css';
+import Tavoitteet from '@/layouts/tavoitteet.astro';
+import HtmlBody from '@/layouts/htmlbody.astro';
+import Toiminta from '@/layouts/toiminta.astro';
+import Selitteet from '@/layouts/selitteet.astro';
+import Esittely from '@/layouts/esittely.astro';
+import Hae from '@/layouts/hae.astro';
+import fetchTervetuloa from "@/utils/fetchindex"
+
+let fetchedData = await fetchTervetuloa()
+---
+
+<HtmlBody>
+      <div class="w-full max-w-6xl">
+        <div class="text-center pt-32 py-8 px-4 sm:px-6 lg:px-8">
+          <Esittely data={fetchedData}/>
+        </div>
+      </div>
+
+      {fetchedData && (
+        <Tavoitteet otsikkoTavoitteet={fetchedData.otsikkoTavoitteet} tavoitteet={fetchedData.tavoitteet} />
+        <Toiminta tyopaja={fetchedData.tyopaja} tyopajatoiminta={fetchedData.tyopajatoiminta} yksilovalmennus={fetchedData.yksilovalmennus} yksilovalmennuskuvaus={fetchedData.yksilovalmennuskuvaus} />
+        <Selitteet selitteet={fetchedData.info} />
+    )}
+   
+
+    <Hae osoite="/lomake" viesti={fetchedData?.hakemukseen ?? ""} />
+
+</HtmlBody>
