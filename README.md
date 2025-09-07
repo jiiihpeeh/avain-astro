@@ -1,13 +1,25 @@
-# Astro with Tailwind
+#Astro-sivu
+
+Tämä on yhden sivuston lähdekoodi. Projekti käyttää Astroa. Suorainen sovellus tämä ei ole vaan tarvitsee Strapi cms:n ja yhteensopivat tietorakenteet.
+
+Käynnistä palvelin
+```sh
+./start
+```
+Enemmän tietoja voi lukea kyseisestä skriptistä ja package.json.
+
+Koodi on julkaistu GPL3-lisensillä, koska hyödyntää LightGallery-koodia.
+#
+Astro Page
+
+This is the source code for a web site. The project uses Astro. This is not a standalone application; it requires Strapi CMS and compatible data structures.
+
+Start the server
 
 ```sh
-npm create astro@latest -- --template with-tailwindcss
+./start
 ```
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/with-tailwindcss)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/with-tailwindcss)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/with-tailwindcss/devcontainer.json)
+More information can be found in the respective script and package.json.
 
-Astro comes with [Tailwind](https://tailwindcss.com) support out of the box. This example showcases how to style your Astro project with Tailwind.
-
-For complete setup instructions, please see our [Tailwind Integration Guide](https://docs.astro.build/en/guides/integrations-guide/tailwind).
+The code is published under the GPL3 license because it utilizes LightGallery code.
