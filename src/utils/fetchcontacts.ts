@@ -74,21 +74,31 @@ export async function fetchPersonnel(): Promise<Worker[]> {
       const filename = `${person.kuva.hash}${person.kuva.ext}`;
       const originalPath = await downloadImage(`${cms}${person.kuva.url}`, filename, 'henkilo');
 
-      const webpPath = originalPath.replace(/\.[a-z0-9]+$/i, '_img.webp');
-      const fullInputPath = `./public/${originalPath}`;
-      const fullOutputPath = `./public/${webpPath}`;
-
-     if (!fs.existsSync(fullOutputPath)) {
-        await convertImage(fullInputPath, fullOutputPath, {
-          quality: 85,
-          maxWidth: 300,
-          maxHeight: 300,
-          format: 'webp',
-        });
-      }else {
-        console.log("personal image is scaled already")
+      const imagePath = originalPath.replace(/\.[a-z0-9]+$/i, '_img');
+      const fullimagePath = `./public/${imagePath}`
+      const formats = ["avif", "webp", "jpg"]
+      interface ImageQualitySettings {
+        [format: string]: number;
       }
-
+      const qualitySettings : ImageQualitySettings = {
+        webp: 83,
+        jpg: 82,
+        avif: 58,
+      };
+      const fullInputPath = `./public/${originalPath}`
+      for ( let format of formats  ) {
+        const fullOutputPath = `${fullimagePath}.${format}`;
+        if (!fs.existsSync(fullOutputPath)) {
+          await convertImage(fullInputPath, fullOutputPath, {
+              quality: qualitySettings[format],
+              maxWidth: 300,
+              maxHeight: 300,
+              format: format === "jpg" ? "jpeg" : format,
+          })
+        }else {
+            console.log("personal image is scaled already")
+        }
+      }
       personal.push({
         nimi: person.nimi,
         nimike: person.nimike,
@@ -96,7 +106,7 @@ export async function fetchPersonnel(): Promise<Worker[]> {
         tervehdys: person.tervehdys,
         puhelin: person.puhelin,
         email: person.email,
-        kuva: { url: `${site}${webpPath}` },
+        kuva: { url: `${imagePath}` },
       });
     }
 

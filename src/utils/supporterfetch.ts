@@ -94,7 +94,7 @@ export default async function fetchSupporters(): Promise<SupporterData[]> {
           optimizeSvg(originalPath)
         } 
         supporterData.push({
-          imgUrl: `${site}${localPath}`,
+          imgUrl: `${localPath}`,
           link: part.linkki,
           title: part.nimi
         });

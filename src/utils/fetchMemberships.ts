@@ -91,10 +91,10 @@ export default async function fetchMemberships(): Promise<SupporterData[]> {
         const isVector = image.mime === 'image/svg+xml' || image.ext === '.svg';
         if (isVector) {
           const originalPath = `./public/${localPath}`;
-          optimizeSvg(originalPath)
+          await optimizeSvg(originalPath)
         } 
         memberships.push({
-          imgUrl: `${site}${localPath}`,
+          imgUrl: `${localPath}`,
           link: part.linkki,
           title: part.nimi
         });

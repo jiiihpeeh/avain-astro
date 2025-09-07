@@ -272,9 +272,9 @@ export default async function fetchGallery(): Promise<Galleries> {
   }
 
   function publicUrl(filepath: string): string {
-    return `${site}/${filepath.replace(/^public\//, '').replace(/\.[a-z0-9]+$/i, '')}`;
+    return `${filepath.replace(/^public\//, '').replace(/\.[a-z0-9]+$/i, '')}`;
   }
   function publicUrlVid(filepath: string): string {
-    return `${site}/${filepath.replace(/^public\//, '')}`;
+    return `${filepath.replace(/^public\//, '')}`;
   }
 }

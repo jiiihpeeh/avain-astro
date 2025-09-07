@@ -161,7 +161,7 @@ export default async function fetchBackgroundGraphics(): Promise<ImageData[]> {
         }
 
         return {
-          url: `${site}${finalUrlPath}`,
+          url: `${finalUrlPath}`,
           alt: graphic.alternativeText || graphic.name,
         };
       })

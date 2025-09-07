@@ -89,10 +89,10 @@ export default async function fetchSocialMedia(): Promise<Some[]> {
       const isVector = image.mime === 'image/svg+xml' || image.ext === '.svg';
       if (isVector) {
         const originalPath = `./public/${localPath}`;
-        optimizeSvg(originalPath)
+        await optimizeSvg(originalPath)
       } 
       some.push({
-        iconUrl: `${site}${localPath}`,
+        iconUrl: `${localPath}`,
         url: entry.linkki
       });
     }

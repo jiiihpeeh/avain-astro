@@ -39,7 +39,7 @@ const backgroundGraphics = await fetchBackgroundGraphics();
           style={{
             top: `${verticalPosition}px`,   // Use pixel-based vertical positioning
             left: isLeft ? "5%" : "calc(95% - 250px)",  // Left or right positioning
-            transform: isLeft ? "translateX(-25%)" : "translateX(25%)",  // Adjust based on position
+            transform: `translateX(${isLeft ? -25 : 25}%) rotate(${Math.random() * 20 - 10}deg) scale(${Math.random() * 0.35 + 0.75})`,
             width: `${imageSize}px`,        // Set the width to 250px
             height: `${imageSize}px`,       // Set the height to 250px
             objectFit: "contain",
