@@ -51,7 +51,7 @@ interface GraphicsResponse {
   };
 }
 
-interface ImageData {
+export interface ImageData {
   url: string;
   alt: string;
 }
@@ -107,7 +107,7 @@ export default async function fetchBackgroundGraphics(): Promise<ImageData[]> {
 
         if (isVector) {
           console.log(`🧽 Optimizing SVG: ${originalPath}`);
-          optimizeSvg(originalPath);
+          await optimizeSvg(originalPath);
         } else {
           const parsedPath = path.parse(fullOriginalPath);
           const renamedFilename = `${parsedPath.name}_bitmap${parsedPath.ext}`;

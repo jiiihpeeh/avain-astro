@@ -13,13 +13,14 @@ let supporterData = await fetchMemberships()
         target="_blank" 
         rel="noopener noreferrer"
         title={supporter.title} 
-        class="flex items-center justify-center p-4 bg-white rounded-md shadow-md hover:scale-105 transition-transform w-40 h-20"
+        class="relative z-10 flex items-center justify-center p-4 bg-white rounded-md shadow-md hover:scale-105 transition-transform w-40 h-20 sm:w-48 sm:h-24 cursor-pointer"
       >
         {supporter && (
           <img
             src={supporter.imgUrl} 
             alt={supporter.title}
             class="w-40 h-20 object-contain"
+            loading="lazy"
           />
         )}
       </a>

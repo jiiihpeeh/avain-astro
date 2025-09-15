@@ -5,6 +5,7 @@ import { cms, site } from '@/utils/constants';
 import { downloadImage } from '@/utils/downloadimages';
 import { getEnvMode } from '@/utils/getEnvMode';
 import { optimizeSvg } from './optimizesvg';
+import { convertImage } from './compressImage';
 
 interface Image {
   id: number;
@@ -87,12 +88,16 @@ export default async function fetchSupporters(): Promise<SupporterData[]> {
       for (const im of part.kuvake) {
         const filename = `${im.hash}${im.ext}`;
         const url = `${cms}${im.url}`;
-        const localPath = await downloadImage(url, filename, 'support');
+        let localPath = await downloadImage(url, filename, 'support');
         const isVector = im.mime === 'image/svg+xml' || im.ext === '.svg';
         if (isVector) {
           const originalPath = `./public/${localPath}`;
-          optimizeSvg(originalPath)
-        } 
+          await optimizeSvg(originalPath)
+        } else {
+          const originalPath = `./public/${localPath}`;
+          await convertImage(originalPath, originalPath+".webp", { quality :256, maxWidth: 256, maxHeight :80, format : 'webp'})
+          localPath = localPath+".webp"
+        }
         supporterData.push({
           imgUrl: `${localPath}`,
           link: part.linkki,

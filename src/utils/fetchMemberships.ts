@@ -5,6 +5,7 @@ import { cms, site } from '@/utils/constants';
 import { downloadImage } from '@/utils/downloadimages';
 import { getEnvMode } from '@/utils/getEnvMode';
 import { optimizeSvg } from './optimizesvg';
+import { convertImage } from './compressImage';
 
 // --- Types ---
 interface Image {
@@ -87,12 +88,16 @@ export default async function fetchMemberships(): Promise<SupporterData[]> {
       for (const image of part.kuvake) {
         const filename = `${image.hash}${image.ext}`;
         const url = `${cms}${image.url}`;
-        const localPath = await downloadImage(url, filename, 'support');
+        let localPath = await downloadImage(url, filename, 'support');
         const isVector = image.mime === 'image/svg+xml' || image.ext === '.svg';
         if (isVector) {
           const originalPath = `./public/${localPath}`;
           await optimizeSvg(originalPath)
-        } 
+        } else {
+          const originalPath = `./public/${localPath}`;
+          await convertImage(originalPath, originalPath+".webp", { quality :80, maxWidth: 256, maxHeight :256, format : 'webp'})
+          localPath = localPath+".webp"
+        }
         memberships.push({
           imgUrl: `${localPath}`,
           link: part.linkki,

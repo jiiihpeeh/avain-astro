@@ -5,6 +5,7 @@ import { cms } from '@/utils/constants';
 import { downloadImage } from '@/utils/downloadimages';
 import { getEnvMode } from '@/utils/getEnvMode';
 import { optimizeSvg } from './optimizesvg';
+import { convertImage } from './compressImage';
 
 interface Logo {
   id: number;
@@ -108,8 +109,11 @@ export default async function fetchNavbarData(): Promise<NavbarData> {
         const dataUrl = `data:${mimeType};base64,${base64Image}`;
         logoUrl = dataUrl
       }
-
-    } 
+    } else {
+      const originalPath = `./public/${logoUrl}`;
+      await convertImage(originalPath, originalPath+".webp", { quality :82, maxWidth: 100, maxHeight :100, format : 'webp'})
+      logoUrl = logoUrl+".webp"
+    }
     const result = { sivut, logoUrl };
 
     // Cache to disk

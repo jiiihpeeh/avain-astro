@@ -29,9 +29,12 @@ import Tukija from "./tukija.astro";
         </div>
       </div>
   
-      <div class="mt-10 text-center text-sm text-gray-300">
+      <div class="mt-10 text-center text-sm text-gray-300 relative z-30">
         <p>© {new Date().getFullYear()} Avainasema.</p>
-        <a href="https://github.com/jiiihpeeh/avain-astro" class="text-blue-400 hover:underline">Lähdekoodi</a>
+        <a href="https://github.com/jiiihpeeh/avain-astro" 
+          class="text-blue-400 hover:underline relative z-50 pointer-events-auto" >
+          Lähdekoodi
+        </a>
       </div>
     </div>
   </footer>

@@ -5,6 +5,7 @@ import { cms, site } from '@/utils/constants';
 import { downloadImage } from '@/utils/downloadimages';
 import { getEnvMode } from '@/utils/getEnvMode';
 import { optimizeSvg } from './optimizesvg';
+import { convertImage } from './compressImage';
 
 interface Image {
   id: number;
@@ -85,11 +86,15 @@ export default async function fetchSocialMedia(): Promise<Some[]> {
     for (const entry of socialMediaData.data) {
       const image = entry.kuvake;
       const fileName = `${image.hash}${image.ext}`;
-      const localPath = await downloadImage(`${cms}${image.url}`, fileName, 'some');
+      let localPath = await downloadImage(`${cms}${image.url}`, fileName, 'some');
       const isVector = image.mime === 'image/svg+xml' || image.ext === '.svg';
       if (isVector) {
         const originalPath = `./public/${localPath}`;
         await optimizeSvg(originalPath)
+      }else {
+        const originalPath = `./public/${localPath}`;
+        await convertImage(originalPath, originalPath+".webp", { quality :80, maxWidth: 100, maxHeight :100, format : 'webp'})
+        localPath  = localPath +".webp"
       } 
       some.push({
         iconUrl: `${localPath}`,

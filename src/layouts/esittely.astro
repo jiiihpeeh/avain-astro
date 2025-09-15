@@ -10,33 +10,12 @@ const  data : TervetuloaProcessed | null  = Astro.props.data;
 
 let logourl : string = await fetchLogoImage()
 
-//console.log(logourl)
-/* 
-if (path.extname(originalPath).toLowerCase() === '.svg') {
-  try {
-    const stats = fs.statSync(originalPath);
 
-    if (stats.size < 21 * 1024) { // < 21 KB
-      const fileContent = fs.readFileSync(originalPath, 'utf8');
-
-      // Basic safety check: Ensure it actually looks like an SVG
-      if (fileContent.trim().startsWith('<svg')) {
-        const mimeType = 'image/svg+xml';
-        const base64Image = Buffer.from(fileContent).toString('base64');
-        logourl = `data:${mimeType};base64,${base64Image}`;
-      }
-    }
-  } catch (err) {
-    console.error('Error handling SVG:', err);
-  }
-}
-
-  */
 
 ---
 
 {data ? (
-  <div class="w-full max-w-5xl mx-auto bg-white/70 backdrop-blur-md rounded-3xl shadow-xl border border-green-200 px-8 py-12 space-y-6 text-center">
+  <div class="w-full max-w-5xl mx-auto bg-white/55 rounded-3xl shadow-xl border border-green-200/60 px-8 py-12 space-y-6 text-center">
     <div class="flex justify-center items-center">
       <img 
         src={logourl}  
@@ -44,7 +23,7 @@ if (path.extname(originalPath).toLowerCase() === '.svg') {
         width="200" 
         height="150" 
         loading="eager"
-        class="w-full max-w-[220px] sm:max-w-[260px] md:max-w-[300px] h-auto object-contain p-2 bg-amber-50 border border-white rounded-xl shadow-md"
+        class="w-full max-w-[220px] sm:max-w-[260px] md:max-w-[300px] h-auto object-contain p-2 bg-amber-50/60 border border-white/50 rounded-xl shadow-md backdrop-blur-sm"
       />
     </div>
 
@@ -52,7 +31,10 @@ if (path.extname(originalPath).toLowerCase() === '.svg') {
       {data.otsikko}
     </h1>
 
-    <div class="w-full text-center text-lg sm:text-xl text-gray-600 leading-relaxed space-y-2" set:html={data.kuvaus} />
+    <div
+      class="w-full text-center text-lg sm:text-xl text-gray-600/90 leading-relaxed space-y-2"
+      set:html={data.kuvaus}
+    />
   </div>
 ) : (
   <p class="text-lg text-gray-500">Lataa...</p>

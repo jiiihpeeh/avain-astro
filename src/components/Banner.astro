@@ -1,0 +1,74 @@
+---
+import fetchBanner from "@/utils/fetchbanner"
+
+const bannerData = await fetchBanner()
+const vidArray = bannerData.videot
+---
+<section class="relative flex justify-center items-center w-full max-h-[580px] bg-cover bg-center sm:min-h-[320px]" id="banner-area">
+    <div class="relative z-10 transform">
+    
+    <div class="overflow-hidden rounded-full shadow-2xl border-4 border-lime-100/85 relative z-20 mt-3 mb-5 mx-2">
+      <video autoplay muted loop preload="auto" class="w-full h-full object-cover" id="welcomevid" poster={bannerData.posteri}>
+        <source src="" id="webmwelcome" type="video/webm"/>
+        <source src="" id="mp4welcome" type="video/mp4"/>
+      </video>
+    </div>
+
+  </div>
+
+  <div
+      class="absolute inset-0 w-full h-full z-0 bg-repeat-x bg-auto bg-center"
+      style={{ backgroundImage: `url(${bannerData.tekstuuri})` }}
+      id="frontpage-banner-bg"
+  ></div>
+
+</section>
+
+
+
+<script type="module" is:inline define:vars={{vidArray}}>
+  function getMinimalWidthVideosByFormat(videos) {
+    const formatMap = videos.reduce((acc, video) => {
+      const existing = acc[video.format];
+      if (!existing || video.width < existing.width) {
+        acc[video.format] = video;
+      }
+      return acc;
+    }, {});
+    return Object.values(formatMap);
+  }
+  const video = document.getElementById("welcomevid");
+  const webmsource = document.getElementById("webmwelcome");
+  const mp4source = document.getElementById("mp4welcome");
+
+  const mininimal = getMinimalWidthVideosByFormat(vidArray)
+  const fallbackWebm = mininimal.find(v => v.format === 'video/webm');
+  const fallbackMp4 = mininimal.find(v => v.format === 'video/mp4');
+
+  function updateVideoSource() {
+    const width = window.innerWidth;  
+    if (video && webmsource && mp4source) {
+      const bestWidthWebm = Math.max(...vidArray.filter(v => v.format === 'video/webm' && v.width <= width - 20).map(v => v.width))
+      const bestWebm = vidArray.filter( v => v.format === "video/webm" && v.width === bestWidthWebm )[0]
+      const bestWidthMp4 = Math.max(...vidArray.filter(v => v.format === 'video/mp4' && v.width <= width - 20).map(v => v.width))
+      const bestMp4 = vidArray.filter( v => v.format === "video/mp4" && v.width === bestWidthMp4 )[0]
+    
+      webmsource.src = bestWebm?.url || fallbackWebm?.url || '';
+      mp4source.src = bestMp4?.url || fallbackMp4?.url || '';
+      video.load();
+    }
+  }
+
+  let resizing = false;
+
+  window.addEventListener("resize", () => {
+    if (resizing) return;  
+
+    resizing = true;
+    requestAnimationFrame(() => {
+      updateVideoSource(); 
+      resizing = false; 
+    });
+  });
+  updateVideoSource();
+</script>

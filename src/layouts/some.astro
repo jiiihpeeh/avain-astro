@@ -10,11 +10,12 @@ let some = await fetchSocialMedia()
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-block p-2 rounded-full bg-white hover:bg-gray-200 transition-colors"      >
+        class="inline-block p-2 rounded-full bg-white hover:bg-gray-200 transition-colors relative z-10" >
         <img
           src={item.iconUrl}
           alt={item.iconUrl || 'Social Media Icon'}
           class="w-8 h-8"
+          loading="lazy"
         />
       </a>
     ))

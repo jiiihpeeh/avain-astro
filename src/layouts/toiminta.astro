@@ -2,13 +2,13 @@
 const { tyopaja, tyopajatoiminta, yksilovalmennus, yksilovalmennuskuvaus } = Astro.props;
 ---
 
-<div class="flex flex-col md:flex-row gap-4 max-w-6xl mx-auto mt-8">
-    <section class="flex-1 border-2 border-dashed border-green-500 rounded-lg p-6 space-y-4 bg-amber-50 shadow-md">
+<div class="flex flex-col md:flex-row gap-4 max-w-6xl mx-4 mt-8">
+    <section class="flex-1 border-2 border-dashed border-green-500 rounded-lg p-6 space-y-4 bg-amber-50/60 shadow-md">
       <h2 class="text-xl font-bold text-gray-800">{tyopaja}</h2>
       <div set:html={tyopajatoiminta} />
     </section>
 
-    <section class="flex-1 border-2 border-dashed border-green-500 rounded-lg p-6 space-y-4 bg-amber-50 shadow-md">
+    <section class="flex-1 border-2 border-dashed border-green-500 rounded-lg p-6 space-y-4 bg-amber-50/60 shadow-md">
       <h2 class="text-xl font-bold text-gray-800">{yksilovalmennus}</h2>
       <div set:html={yksilovalmennuskuvaus} />
     </section>

@@ -8,6 +8,7 @@ import fetchBackgroundGraphics from "@/utils/backgroundfetch"
 import fetchLogoImage from "@/utils/fetchlogo"
 import fetchMemberships from "@/utils/fetchMemberships"
 import fetchNavbarData from "@/utils/navfetch"
+import fetchBanner from '@/utils/fetchbanner';
 
 
 await returnGallery();
@@ -27,3 +28,5 @@ await fetchLogoImage()
 await fetchMemberships()
 
 await fetchNavbarData()
+
+await fetchBanner()

@@ -8,24 +8,38 @@ import Selitteet from '@/layouts/selitteet.astro';
 import Esittely from '@/layouts/esittely.astro';
 import Hae from '@/layouts/hae.astro';
 import fetchTervetuloa from "@/utils/fetchindex"
+import Banner from '@/components/Banner.astro';
 
 let fetchedData = await fetchTervetuloa()
 ---
 
 <HtmlBody>
-      <div class="w-full max-w-6xl">
-        <div class="text-center pt-32 py-8 px-4 sm:px-6 lg:px-8">
-          <Esittely data={fetchedData}/>
-        </div>
-      </div>
+  <Banner />
 
-      {fetchedData && (
-        <Tavoitteet otsikkoTavoitteet={fetchedData.otsikkoTavoitteet} tavoitteet={fetchedData.tavoitteet} />
-        <Toiminta tyopaja={fetchedData.tyopaja} tyopajatoiminta={fetchedData.tyopajatoiminta} yksilovalmennus={fetchedData.yksilovalmennus} yksilovalmennuskuvaus={fetchedData.yksilovalmennuskuvaus} />
-        <Selitteet selitteet={fetchedData.info} />
-    )}
-   
+  {/* Content Below Banner */}
+  <div class="w-full max-w-6xl mt-8 mb-8">
+    <div class="text-center pt-8 py-4 px-4 sm:px-6 lg:px-8">
+      <Esittely data={fetchedData} />
+    </div>
+  </div>
+{/* Conditionally Render Content */}
+{fetchedData && (
+  <>
+    <Tavoitteet
+      otsikkoTavoitteet={fetchedData.otsikkoTavoitteet}
+      tavoitteet={fetchedData.tavoitteet}
+    />
+    <Toiminta
+      tyopaja={fetchedData.tyopaja}
+      tyopajatoiminta={fetchedData.tyopajatoiminta}
+      yksilovalmennus={fetchedData.yksilovalmennus}
+      yksilovalmennuskuvaus={fetchedData.yksilovalmennuskuvaus}
+    />
+    <Selitteet selitteet={fetchedData.info} />
+  </>
+)}
 
-    <Hae osoite="/lomake" viesti={fetchedData?.hakemukseen ?? ""} />
+{/* Call to Action Section */}
+<Hae osoite="/lomake" viesti={fetchedData?.hakemukseen ?? ""} />
 
 </HtmlBody>

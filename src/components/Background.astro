@@ -19,115 +19,172 @@ const backgroundGraphics = await fetchBackgroundGraphics();
     <path fill="#fde68a" d="M42.7,-73.7C54.6,-66.2,62.9,-54.3,69.2,-41.7C75.5,-29.1,79.8,-15.9,77.4,-3.4C75,-9.2,65.7,7.7,59.8,21.7C54,35.7,51.5,47,43.1,56.7C34.7,66.5,20.4,74.6,5.8,70.7C-8.9,66.8,-17.8,50.8,-29,39.3C-40.2,27.7,-53.7,20.7,-60.7,8.8C-67.7,-3.1,-68.2,-20,-62.4,-35.7C-56.5,-51.4,-44.4,-66,-30.3,-72.1C-16.1,-78.2,-0.8,-75.8,13.9,-72.7C28.7,-69.7,42.7,-66.2,42.7,-73.7Z" transform="translate(100 100)" />
   </svg>
 </div>
+<!-- <div id="background-container" class="fixed inset-0 -z-10"></div> -->
+<div id="background-container" class="relative w-full -z-10"></div>
 
-{backgroundGraphics.length > 0 && (
-  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10 flex flex-col justify-between" id="background-container">
-    {backgroundGraphics.map((graphic, index) => {
-      const isLeft = index % 2 === 0;
-      const imageId = "background-" + index; // Use index to create unique id for each image
-      const imageSize = 220;  // The new image size: 250x250 pixels
-      const margin = 20;      // Spacing between images
+<script type="module" define:vars={{backgroundGraphics}} is:inline>
+  let offset = Math.round(Math.random())
 
-      // Calculate dynamic vertical position based on image size
-      const verticalPosition = (index * (imageSize + margin)); 
-
-      return (
-        <img
-          src={graphic.url}
-          id={imageId}
-          class="absolute hidden md:block opacity-50 mix-blend-screen drop-shadow-lg saturate-150 contrast-125"
-          style={{
-            top: `${verticalPosition}px`,   // Use pixel-based vertical positioning
-            left: isLeft ? "5%" : "calc(95% - 250px)",  // Left or right positioning
-            transform: `translateX(${isLeft ? -25 : 25}%) rotate(${Math.random() * 20 - 10}deg) scale(${Math.random() * 0.35 + 0.75})`,
-            width: `${imageSize}px`,        // Set the width to 250px
-            height: `${imageSize}px`,       // Set the height to 250px
-            objectFit: "contain",
-          }}
-        />
-      );
-    })}
-  </div>
-)}
-
-<script type="module">
-  async function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  function clearContainer(container) {
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
+    }
   }
-  // Shuffle function (Fisher-Yates)
-  const shuffleArray = (array) => {
+  function getScalingFactor(minWidth = 320, maxWidth = 1700, minScale = 0.75, maxScale = 1.0) {
+    const clampedWidth = Math.min(Math.max(window.innerWidth, minWidth), maxWidth);
+    const scale =
+      ((clampedWidth - minWidth) / (maxWidth - minWidth)) * (maxScale - minScale) + minScale;
+    console.log(scale)
+    return scale;
+  }
+
+  function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+      [array[i], array[j]] = [array[j], array[i]];
     }
-  };
+    return array;
+  }
 
-  // Track the previous order of indexes
-  let previousOrder = [];
+  async function downloadImage(url) {
+    try {
+      // Fetch the image from the URL
+      const response = await fetch(url);
+      
+      // Check if the response is ok
+      if (!response.ok) {
+        throw new Error('Image failed to load');
+      }
 
-  // Function to shuffle and ensure a different order from the previous one
-  const getShuffledOrder = (array) => {
-    let newOrder;
-    do {
-      // Create an array of indexes and shuffle
-      newOrder = [...array];
-      shuffleArray(newOrder);
-    } while (arraysAreEqual(newOrder, previousOrder));  // Keep shuffling if the order is the same as the last one
-    previousOrder = newOrder;  // Update the previous order
-    return newOrder;
-  };
+      // Get the Blob from the response
+      const blob = await response.blob();
 
-  // Function to compare two arrays
-  const arraysAreEqual = (arr1, arr2) => {
-    if (arr1.length !== arr2.length) return false;
-    for (let i = 0; i < arr1.length; i++) {
-      if (arr1[i] !== arr2[i]) return false;
+      // Convert the Blob to a Data URL using FileReader wrapped in a Promise
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = () => reject('Failed to read Blob');
+        
+        reader.readAsDataURL(blob);
+      });
+
+      return base64Data;
+    } catch (err) {
+      throw new Error(`Failed to download image: ${err.message}`);
     }
-    return true;
-  };
+  }
 
-  // Function to update the images every 10 seconds with transformation effects
-  async function updateImages(){
-    await sleep(1000)
+  async function createImagesInHTML(graphics) {
     const container = document.getElementById('background-container');
-    const images = Array.from(container.querySelectorAll('img'));
+    if (!container) {
+      console.warn('❌ Container not found!');
+      return;
+    }
 
-    // Create an array of indexes
-    const indexes = images.map((_, index) => index);
+    clearContainer(container);
 
-    // Get the new shuffled order of indexes (ensuring it's not the same as the previous order)
-    const shuffledIndexes = getShuffledOrder(indexes);
+    const scalingFactor = getScalingFactor();
+    const imageSize = 200 * scalingFactor;
+    const spacing = 80 * scalingFactor;
 
-    // Add a transformation effect before re-positioning
-    shuffledIndexes.forEach((index, newIndex) => {
-      const img = images[index];
-      const imageSize = 200;
-      const margin = 20;
-      const verticalPosition = (newIndex * (imageSize + margin));
+    const banner = document.getElementById("frontpage-banner-bg");
+    let reservedH = 30;
+    if (banner && window.innerWidth < 1300) {
+      reservedH = banner.getBoundingClientRect().height + reservedH;
+    }
 
-      // Start transition effect by adding transform
-      img.style.transition = "transform 1s ease-in-out, opacity 1s ease-in-out";
-      img.style.opacity = "0";  // Start by fading out
+    const height = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight,
+      document.body.offsetHeight,
+      document.documentElement.offsetHeight,
+      document.body.clientHeight,
+      document.documentElement.clientHeight
+    ) * 0.95 - reservedH;
 
-      // Wait for the opacity to fade before moving to the next position
-      setTimeout(() => {
-        // Re-calculate the position for shuffling
-        img.style.top = `${verticalPosition + 48}px`;
-        img.style.left = newIndex % 2 === 0 ? "5%" : "calc(95% - 250px)";
-        img.style.transform = `translateX(${(newIndex % 2 === 0 ? -1 : 1) * 25}%) rotate(${Math.random() * 20 - 10}deg) scale(${Math.random() * 0.35 + 0.75})`;  // Add rotation and scaling
-        img.style.opacity = "1";  // Fade back in
-      }, 500);  // Give time for opacity to transition
+    const numberOfItems = Math.floor(height / (imageSize + spacing));
+    const slicedArray = shuffleArray(graphics).slice(0, numberOfItems);
 
-      // Ensure all images have a smooth transition effect
-      img.style.transition = "transform 1s ease-in-out, opacity 1s ease-in-out";
+    let spacingHeight = height / slicedArray.length;
+    let spacingBetween = spacingHeight - imageSize;
+    offset ^= 1;
+
+    // Use for...of loop to handle async operations
+    for (const [index, graphic] of slicedArray.entries()) {
+      const filename = graphic.url.split('/').pop();
+      const key = `image_${filename}`;
+      let base64Data = localStorage.getItem(key);
+
+      if (!base64Data) {
+        try {
+          base64Data = await downloadImage(graphic.url);
+          localStorage.setItem(`image_${filename}`, base64Data); // Fixed variable name
+        } catch (err) {
+          console.error(`❌ Failed to download image: ${graphic.url}`, err);
+          continue; // Skip to the next iteration if download fails
+        }
+      }
+
+      const imageId = `image-${index}`;
+      const sizeVariation = Math.random() * 50;
+      const finalSize = imageSize + sizeVariation;
+
+      const verticalPosition = index * (imageSize + spacingBetween) + reservedH;
+
+      const isLeft = index % 2 === offset;
+      const horizontalPosition = isLeft
+        ? '5%'
+        : `calc(95% - ${Math.round(250 * scalingFactor)}px)`;
+
+      const img = document.createElement('img');
+      img.src = base64Data;
+      img.id = imageId;
+      img.classList.add(
+        'absolute',
+        'mix-blend-screen',
+        'drop-shadow-lg',
+        'saturate-150',
+        'contrast-125'
+      );
+
+      img.style.cssText = `
+        top: ${verticalPosition}px;
+        left: ${horizontalPosition};
+        width: ${finalSize * scalingFactor}px;
+        height: ${finalSize * scalingFactor}px;
+        object-fit: contain;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateX(${isLeft ? '-150%' : '150%'}) rotate(0deg) scale(1);
+        transition: transform 0.7s ease, opacity 0.7s ease;
+      `;
+
+      container.appendChild(img);
+
+      // Trigger reflow to ensure styles are applied before animation starts
+      img.getBoundingClientRect();
+
+      // Apply final transformation and opacity after image is appended
+      img.style.transform = `
+        translateX(${isLeft ? '-25%' : '25%'}) rotate(${Math.random() * 20 - 10}deg) scale(${Math.random() * 0.2 + 0.9})
+      `;
+      img.style.opacity = '0.75';
+    }
+
+    console.log("✔️ Finished creating images in HTML.");
+  }
+
+
+  function startAutoShuffle() {
+    createImagesInHTML(backgroundGraphics);
+    setInterval(() => {
+      createImagesInHTML(backgroundGraphics);
+    }, 9500);
+  }
+
+  // Wait for images to be stored, then start shuffle after page load
+    window.addEventListener("load", () => {
+      startAutoShuffle(); 
     });
-
-    console.log("Images shuffled with effects!");
-  };
-
-  // Initial shuffle on page load
-  updateImages();
-
-  // Set interval to shuffle images every 10 seconds
-  setInterval(updateImages, 10000);
 </script>
